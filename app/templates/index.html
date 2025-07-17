@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GemTalk Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">🤖 GemTalk</div>
+    <div id="chat-box" class="chat-box"></div>
+    
+    <div class="quick-actions">
+      <button onclick="sendQuickMessage('Tell me a joke')">Tell me a joke</button>
+      <button onclick="sendQuickMessage('Give me today\'s quote')">Today's Quote</button>
+      <button onclick="sendQuickMessage('Say something fun')">Getting Bored</button>
+      <button onclick="sendQuickMessage('Recommend something cool')">I want Recommendation</button>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="user-input" placeholder="Ask me anything..." onkeypress="handleKeyPress(event)" />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
