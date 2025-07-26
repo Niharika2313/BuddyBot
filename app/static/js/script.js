@@ -2,8 +2,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const settingsButton = document.getElementById('settings-button');
   const settingsDropdown = document.getElementById('settings-dropdown');
   const themeToggle = document.getElementById('theme-toggle');
+  const clearChatButton = document.getElementById('clear-chat-button');
+  const chatBox = document.getElementById('chat-box');
   const body = document.body;
+  const initialBotMessage = "Hello! How can I help you today?";
 
+  function setupInitialChat() {
+    appendMessage(initialBotMessage, "bot-message");
+  }
+  
   settingsButton.addEventListener('click', function(event) {
     event.stopPropagation();
     settingsDropdown.classList.toggle('show');
@@ -33,6 +40,11 @@ document.addEventListener('DOMContentLoaded', function() {
     body.classList.remove('light-mode');
     themeToggle.checked = true;
   }
+  
+  clearChatButton.addEventListener('click', function() {
+      chatBox.innerHTML = '';
+      setupInitialChat();
+  });
 
   let currentStep = null;
 
@@ -104,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function appendMessage(text, className) {
-    let chatBox = document.getElementById("chat-box");
     let messageDiv = document.createElement("div");
     messageDiv.className = `message ${className}`;
     messageDiv.innerHTML = text;
@@ -113,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function showOptions(options) {
-    let chatBox = document.getElementById("chat-box");
     let optionsDiv = document.createElement("div");
     optionsDiv.className = "options";
 
@@ -132,4 +142,6 @@ document.addEventListener('DOMContentLoaded', function() {
     chatBox.appendChild(optionsDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
+  
+  setupInitialChat();
 });
