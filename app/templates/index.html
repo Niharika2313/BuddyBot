@@ -10,22 +10,31 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">🤖 GemTalk</div>
+    <div class="chat-header">
+      <span>🤖 GemTalk</span>
+      <div id="settings-menu">
+        <button id="settings-button">⚙️</button>
+        <div id="settings-dropdown" class="dropdown-content">
+          <label class="theme-switch">
+            <span>Dark Mode</span>
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
     <div id="chat-box" class="chat-box"></div>
-    
     <div class="quick-actions">
       <button onclick="sendQuickMessage('Tell me a joke')">Tell me a joke</button>
       <button onclick="sendQuickMessage('Give me today\'s quote')">Today's Quote</button>
       <button onclick="sendQuickMessage('Say something fun')">Getting Bored</button>
       <button onclick="sendQuickMessage('Recommend something cool')">I want Recommendation</button>
     </div>
-
     <div class="chat-input">
       <input type="text" id="user-input" placeholder="Ask me anything..." onkeypress="handleKeyPress(event)" />
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
-
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
