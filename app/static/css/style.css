@@ -293,8 +293,9 @@ button:hover {
 }
 .dropdown-button:hover {
   background-color: rgba(0,0,0,0.1);
-  transform: rotate();
 }
+
+/* Added or corrected styles */
 .header-logo {
   height: 50px;
   width: auto;
