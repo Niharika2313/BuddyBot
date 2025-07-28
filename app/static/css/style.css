@@ -23,7 +23,7 @@
   --dropdown-border: 1px solid #00c3ff;
   --scrollbar-thumb: #00b3ff;
   --scrollbar-track: #1a1a2f;
-  --real-vh: 100vh; /* Added for mobile viewport height correction */
+  --real-vh: 100vh;
 }
 
 .light-mode {
@@ -61,7 +61,6 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 body {
@@ -70,6 +69,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
+  height: 100%;
   color: var(--text-primary);
   transition: background 0.3s ease, color 0.3s ease;
 }
@@ -344,11 +345,15 @@ button:hover {
 }
 
 @media (max-width: 480px) {
+  body {
+    height: var(--real-vh);
+    min-height: var(--real-vh);
+  }
   .chat-container {
     width: 100%;
-    height: var(--real-vh); /* Using the JS-calculated variable */
-    border-radius: 0;
+    height: 100%;
     max-width: none;
     max-height: none;
+    border-radius: 0;
   }
 }
