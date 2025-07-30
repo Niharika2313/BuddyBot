@@ -8,20 +8,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const body = document.body;
 
     const initialBotMessage = "Hey there! I'm BuddyBot, your friendly assistant. How can I lend a hand today?";
-    let loadingMessageDiv = null; // Used for loading indicator
-
-    // --- Chat Display Functions ---
+    let loadingMessageDiv = null;
 
     function appendMessage(text, className) {
         let messageDiv = document.createElement("div");
         messageDiv.className = `message ${className}`;
-        messageDiv.innerHTML = text; // For Markdown parsing
+        messageDiv.innerHTML = text;
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function showOptions(options) {
-        // Remove existing options to prevent duplicates
         const existingOptions = chatBox.querySelector('.options');
         if (existingOptions) {
             existingOptions.remove();
@@ -37,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.onclick = function() {
                 appendMessage(option, "user-message");
                 sendMessage(option.toLowerCase());
-                optionsDiv.remove(); // Remove options after selection
+                optionsDiv.remove();
             };
             optionsDiv.appendChild(btn);
         });
@@ -46,10 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // --- Backend Communication ---
-
     async function fetchResponse(userInput) {
-        // Show loading indicator
         loadingMessageDiv = document.createElement("div");
         loadingMessageDiv.className = "message bot-message loading";
         loadingMessageDiv.innerHTML = "BuddyBot is typing...";
@@ -57,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chatBox.scrollTop = chatBox.scrollHeight;
 
         try {
-            let response = await fetch("/chat", {
+            const response = await fetch("/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: userInput })
@@ -67,21 +61,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(`Server responded with status: ${response.status}`);
             }
 
-            let data = await response.json();
+            const data = await response.json();
 
-            // Remove loading indicator
             if (loadingMessageDiv) {
                 loadingMessageDiv.remove();
                 loadingMessageDiv = null;
             }
 
             appendMessage(marked.parse(data.reply), "bot-message");
-
-            // Handle multi-step cart confirmation
-            if (currentStep === "add_to_cart") {
-                appendMessage("Would you like to add these ingredients to your cart?", "bot-message");
-                showOptions(["Yes", "No"]);
-            }
 
         } catch (error) {
             console.error("Fetch Error:", error);
@@ -93,10 +80,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- User Input & Actions ---
-
-    let currentStep = null; // For multi-step conversations
-
     window.sendMessage = async function(userInput = null) {
         if (userInput === null) {
             userInput = userInputElement.value.trim();
@@ -104,52 +87,22 @@ document.addEventListener('DOMContentLoaded', function() {
             appendMessage(userInput, "user-message");
             userInputElement.value = "";
         }
-
-        // Clear active options if user types a new message
-        const activeOptions = chatBox.querySelector('.options');
-        if (activeOptions && currentStep !== "add_to_cart") {
-            activeOptions.remove();
-        }
-
-        // Multi-step conversation logic
-        if (currentStep === "budget") {
-            fetchResponse(`Make a grocery list under ₹${userInput} for a week`);
-            currentStep = null;
-        } else if (currentStep === "ingredient_list") {
-            fetchResponse(`Give the ingredient list for ${userInput}`);
-            currentStep = "add_to_cart";
-        } else if (currentStep === "add_to_cart") {
-            if (userInput.toLowerCase() === "yes") {
-                fetchResponse("Got it! Adding those ingredients to your cart for you.");
-            } else {
-                appendMessage("Okay, not adding to the cart for now.", "bot-message");
-            }
-            currentStep = null;
-        } else {
-            fetchResponse(userInput);
-        }
+        fetchResponse(userInput);
     }
 
     window.sendQuickMessage = function(action) {
         appendMessage(action, "user-message");
 
-        // Map quick actions to backend prompts
         if (action === "Cheer me up!") {
             fetchResponse("Tell me a funny joke!");
-            currentStep = null;
         } else if (action === "What's new today?") {
             fetchResponse("Give me a quick update on current events or interesting facts.");
-            currentStep = null;
         } else if (action === "Got any fun facts?") {
             fetchResponse("Tell me a cool and random fun fact.");
-            currentStep = null;
         } else if (action === "Help me decide...") {
             fetchResponse("I need a recommendation for something cool.");
-            currentStep = null;
         }
     }
-
-    // --- UI Event Listeners & Initialization ---
 
     settingsButton.addEventListener('click', function(event) {
         event.stopPropagation();
@@ -174,18 +127,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load saved theme on startup
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        body.classList.add('light-mode');
-        themeToggle.checked = false;
+    if (savedTheme === null) {
+        // No theme saved, check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            body.classList.remove('light-mode');
+            themeToggle.checked = true;
+        } else {
+            body.classList.add('light-mode');
+            themeToggle.checked = false;
+        }
     } else {
-        body.classList.remove('light-mode');
-        themeToggle.checked = true;
+        // Theme found in localStorage, use it
+        if (savedTheme === 'light') {
+            body.classList.add('light-mode');
+            themeToggle.checked = false;
+        } else {
+            body.classList.remove('light-mode');
+            themeToggle.checked = true;
+        }
     }
 
     clearChatButton.addEventListener('click', function() {
         chatBox.innerHTML = '';
         setupInitialChat();
-        currentStep = null;
         settingsDropdown.classList.remove('show');
     });
 
@@ -199,5 +163,5 @@ document.addEventListener('DOMContentLoaded', function() {
         appendMessage(initialBotMessage, "bot-message");
     }
 
-    setupInitialChat(); // Initialize chat on load
+    setupInitialChat();
 });

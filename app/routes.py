@@ -1,3 +1,4 @@
+import time
 from flask import Blueprint, render_template, request, jsonify
 from app import model
 
@@ -12,36 +13,47 @@ def chat():
     data = request.get_json()
     user_message = data.get("message", "").strip()
 
-    print("🔹 Received message from frontend:", user_message)  # 🔍 Debug line
+    print(f"Received message from frontend: '{user_message}'")
 
     if not user_message:
         return jsonify({"reply": "Please enter a valid message."})
 
-    # 🔸 Predefined quick replies based on your buttons
     quick_prompts = {
-        "Tell me a joke": "Tell me a funny joke.",
-        "Today's Quote": "Share an inspirational quote.",
-        "Getting Bored": "Tell me something fun or a random fact.",
-        "I want Recommendation": "Give me a cool recommendation to try today."
+        "Cheer me up!": "Tell me a funny joke!",
+        "What's new today?": "Give me a quick update on current events or interesting facts.",
+        "Got any fun facts?": "Tell me a cool and random fun fact.",
+        "Help me decide...": "I need a recommendation for something cool."
     }
 
-    # 🔄 If button clicked, override user message with mapped prompt
     prompt_text = quick_prompts.get(user_message, user_message)
 
     try:
+        # Measure time before the API call
+        start_time = time.time()
+
+        # Construct the prompt for Gemini
         prompt = f"""
         Respond concisely in markdown format:
         - Use **bold** for key terms.
         - Keep it short.
-        **User query:** {prompt_text}
+        User query: {prompt_text}
         """
+        
+        # Make the Gemini API call
         response = model.generate_content(prompt)
-        print("🔹 Gemini response:", response)  # 🔍 Debug line
+        
+        # Measure time after the API call
+        end_time = time.time()
+        api_call_duration = end_time - start_time
+        print(f"Gemini API call for '{prompt_text}' took: {api_call_duration:.2f} seconds")
 
         if response and response.text:
             return jsonify({"reply": response.text.strip()})
         else:
-            return jsonify({"reply": "I'm sorry, I couldn't process that."})
+            print("Gemini returned an empty or invalid response.")
+            return jsonify({"reply": "I'm sorry, I couldn't generate a response."})
+
     except Exception as e:
-        print("❌ Error from Gemini:", str(e))  # 🔍 Debug line
-        return jsonify({"reply": f"Error: {str(e)}"})
+        print(f"Error calling Gemini API: {str(e)}")
+        # Provide a user-friendly error message to the frontend
+        return jsonify({"reply": "Sorry, I'm having trouble understanding that right now. Please try again in a moment."})
